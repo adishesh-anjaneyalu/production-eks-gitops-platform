@@ -35,9 +35,6 @@ module "eks" {
       before_compute = true
     }
     kube-proxy = {}
-    aws-ebs-csi-driver = {
-      befoew_compute = true
-    }
     vpc-cni = {
       before_compute = true
     }
