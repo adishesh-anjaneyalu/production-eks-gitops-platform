@@ -280,7 +280,8 @@ There is **NO dedicated “orders database”**.
 ![Gitops Project.drawio.png](docs/images/Gitops_Project.png)
 ---
 ---
-
+---
+---
 # Implementation
 
 ## Install tools in Local Machine
@@ -3102,8 +3103,163 @@ Same HPA structure, just change `name`.
 
 ---
 
-                                                                                End
+                            End
 
 ---
 
+---
+
+# CleanUp
+Delete the load balancer and its security groups first in the UI.
+
+then,
+
+Run in the local machine (Where you intially ran terraform):
+
+```bash
+terraform destroy -auto-approve
+```
+---
+---
+---
+---
+# FAQs
+## How to push the images to GHCR (Github Container Registry) ?
+<details>
+
+<summary>Click to get Answer</summary>
+
+Create a PAT clasic token with the below permission.
+
+Give permissions:
+
+```
+Packages → Read&Write
+```
+
+If private repo add the below as well:
+
+```
+Contents → Read
+```
+
+## Docker Login
+
+Useful if you store images there.
+
+```bash
+echo <TOKEN> | docker login ghcr.io \
+   -u USERNAME \
+   --password-stdin
+```
+
+Tag/Retag your image:
+
+```bash
+docker tag us-central1-docker.pkg.dev/google-samples/microservices-demo/adservice:v0.10.4 ghcr.io/laxmikantagiri/microservices-demo/adservice:v0.10.4
+```
+
+Push the image:
+
+```bash
+  docker push ghcr.io/laxmikantagiri/microservices-demo/adservice:v0.10.4 
+```
+</details>
+
+
+## How to create the helm package and store it in the GHCR ?
+
+<details>
+
+<summary>Click to get Answer</summary>
+
+### Step 1 - Create Token
+Create a PAT clasic token with the below permission.
+
+Give permissions:
+
+```
+Packages → Read&Write
+```
+
+If private repo add the below as well:
+
+```
+Contents →Read
+```
+
+### Step 2 — Login via Helm
+
+Run:
+
+```bash
+echo <YOUR_TOKEN> | helm registry login ghcr.io \
+   -u YOUR_GITHUB_USERNAME \
+   --password-stdin
+```
+
+If successful:
+
+```
+Login Succeeded
+```
+
+Done.
+
+### Docker Login Too (Optional)
+
+Useful if you store images there.
+
+```bash
+echo <TOKEN> | docker login ghcr.io \
+   -u USERNAME \
+   --password-stdin
+```
+
+## What Your Chart Path Will Look Like
+
+OCI format:
+
+```
+oci://ghcr.io/<OWNER>/charts/onlineboutique
+```
+
+Example:
+
+```
+oci://ghcr.io/laxmikanta/charts/onlineboutique
+```
+
+Do :
+
+```bash
+helm package .
+```
+
+You will see the package will get created with `.tgz`  format
+
+```bash
+ubuntu@ip-10-0-101-164:~/Production-Grade_GitOps-Driven_Microservices-Demo/helm-chart$ ls
+Chart.yaml  README.md  onlineboutique-0.10.4.tgz  templates  values.yaml
+```
+
+Push to the repository:
+
+```bash
+helm push onlineboutique-0.10.4.tgz oci://ghcr.io/laxmikantagiri
+```
+
+Now you can directly install the package using the below command
+
+(Make sure its public)
+
+```bash
+helm install boutique oci://ghcr.io/laxmikantagiri/onlineboutique --version 0.10.4
+```
+</details>
+
+---
+---
+                            End
+---
 ---
